@@ -1,0 +1,19 @@
+from datetime import datetime, timezone
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
+
+from app.config import settings
+
+connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+engine = create_engine(settings.database_url, connect_args=connect_args, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+Base = declarative_base()
+
+
+def get_session() -> Session:
+    return SessionLocal()
+
+
+def utcnow() -> datetime:
+    return datetime.now(timezone.utc)
